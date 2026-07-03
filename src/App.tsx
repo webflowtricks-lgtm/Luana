@@ -89,7 +89,29 @@ export default function App() {
 
   // Handle creating a new album
   const handleCreateAlbum = async (albumData: Omit<Album, "id" | "createdAt" | "views">) => {
-    const id = "album-" + Math.random().toString(36).substring(2, 9);
+    // Generate a beautiful, clean, URL-friendly slug from the album name
+    let baseSlug = albumData.name
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // remove accents/diacritics
+      .replace(/[^\w\s-]/g, "") // remove special characters except hyphens and spaces
+      .replace(/\s+/g, "-") // replace spaces with hyphens
+      .replace(/--+/g, "-") // collapse consecutive hyphens
+      .trim();
+
+    if (!baseSlug) {
+      baseSlug = "album";
+    }
+
+    let id = baseSlug;
+    let counter = 1;
+    // Check for collisions and append -1, -2, etc. if needed
+    while (albums.some((album) => album.id === id)) {
+      id = `${baseSlug}-${counter}`;
+      counter++;
+    }
+
     const newAlbum: Album = {
       ...albumData,
       id,
@@ -101,15 +123,6 @@ export default function App() {
       await setDoc(doc(db, "albums", id), removeUndefined(newAlbum));
       // Auto unlock newly created albums for the photographer session
       setUnlockedAlbums((prev) => ({ ...prev, [id]: true }));
-      
-      // Friendly reminder about the password configured
-      if (newAlbum.password) {
-        alert(
-          `Álbum "${newAlbum.name}" criado com sucesso!\n\n🔑 Senha configurada: ${newAlbum.password}\n\nVocê pode testar o bloqueio mudando para o "Modo Cliente" no topo da página!`
-        );
-      } else {
-        alert(`Álbum "${newAlbum.name}" criado com sucesso sem restrições de senha.`);
-      }
     } catch (err) {
       handleFirestoreError(err, OperationType.CREATE, `albums/${id}`);
     }
@@ -173,16 +186,9 @@ export default function App() {
             <h2 className="text-2xl font-bold text-zinc-100 tracking-tight mb-2">
               Álbum não encontrado
             </h2>
-            <p className="text-sm text-zinc-400 max-w-md mb-8">
+            <p className="text-sm text-zinc-400 max-w-md">
               O álbum que você está tentando acessar não existe ou foi removido pelo fotógrafo. Por favor, verifique o link enviado.
             </p>
-            <button
-              onClick={handleGoHome}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#DFBA6B] to-[#B8933D] px-6 py-3 text-sm font-bold text-zinc-950 transition-all hover:opacity-90 active:scale-95 shadow-md shadow-[#DFBA6B]/10"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar ao Início
-            </button>
           </div>
         ) : currentRole === "photographer" && !isPhotographerAuthenticated ? (
           <PhotographerAuth onAuthenticate={handleAuthenticatePhotographer} />

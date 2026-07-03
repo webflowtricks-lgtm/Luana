@@ -295,10 +295,6 @@ export default function ClientAlbumView({
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#B8933D]/10 border border-[#B8933D]/20 px-3 py-1 text-xs font-bold text-[#B8933D]">
-                <Camera className="h-3.5 w-3.5" /> Galeria Privada do Cliente
-              </span>
-
               {galleryTimeLeft && (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1 text-xs font-bold text-zinc-600 border border-zinc-200">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#B8933D] animate-pulse"></span>
@@ -316,15 +312,7 @@ export default function ClientAlbumView({
           </div>
 
           <div className="flex flex-col sm:flex-row gap-2 self-start md:self-auto">
-            <button
-              id="btn-manual-relock-client"
-              onClick={handleManualLock}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-gold-gradient px-5 text-xs font-bold text-black hover:opacity-90 transition-all shadow-md shadow-[#DFBA6B]/10"
-              title="Bloquear galeria imediatamente"
-            >
-              <LogOut className="h-4 w-4 stroke-[2.5]" />
-              Sair e Bloquear
-            </button>
+
           </div>
         </div>
       </div>
@@ -470,22 +458,6 @@ export default function ClientAlbumView({
             </div>
             
             <div className="flex items-center gap-3">
-              {/* Heart Toggle on Lightbox */}
-              <button
-                id="lightbox-toggle-heart"
-                onClick={(e) => handleToggleHeart(album.photos[selectedPhotoIndex].id, e)}
-                className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition-all ${
-                  album.photos[selectedPhotoIndex].approved
-                    ? "bg-gold-gradient text-black font-bold"
-                    : "bg-white/10 text-zinc-200 hover:bg-white/20"
-                }`}
-              >
-                <Heart
-                  className={`h-4 w-4 ${album.photos[selectedPhotoIndex].approved ? "fill-black stroke-black" : ""}`}
-                />
-                {album.photos[selectedPhotoIndex].approved ? "Favoritada" : "Favoritar"}
-              </button>
-
               <button
                 id="lightbox-close-btn-client"
                 onClick={() => setSelectedPhotoIndex(null)}
@@ -524,9 +496,26 @@ export default function ClientAlbumView({
             </button>
           </div>
 
-          {/* Bottom Panel bar */}
-          <div className="bg-gradient-to-t from-zinc-900/90 to-transparent p-4 text-center text-xs text-zinc-400">
-            <p>Selecione suas fotos favoritas utilizando o botão Favoritar no topo da tela.</p>
+          {/* Bottom Panel bar with Favorite button */}
+          <div className="bg-gradient-to-t from-zinc-900/90 to-transparent p-6 flex flex-col items-center gap-3 text-center">
+            {/* Heart Toggle on Lightbox */}
+            <button
+              id="lightbox-toggle-heart"
+              onClick={(e) => handleToggleHeart(album.photos[selectedPhotoIndex].id, e)}
+              className={`flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all shadow-lg cursor-pointer ${
+                album.photos[selectedPhotoIndex].approved
+                  ? "bg-gold-gradient text-black"
+                  : "bg-white/10 text-zinc-100 hover:bg-white/20 border border-white/5"
+              }`}
+            >
+              <Heart
+                className={`h-4.5 w-4.5 ${album.photos[selectedPhotoIndex].approved ? "fill-black stroke-black" : ""}`}
+              />
+              {album.photos[selectedPhotoIndex].approved ? "Favoritada" : "Favoritar Foto"}
+            </button>
+            <p className="text-xs text-zinc-400">
+              Marque esta foto como favorita clicando no botão acima.
+            </p>
           </div>
         </div>
       )}
