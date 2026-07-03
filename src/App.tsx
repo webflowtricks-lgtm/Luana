@@ -8,7 +8,7 @@ import ClientAlbumView from "./components/ClientAlbumView";
 import NewAlbumModal from "./components/NewAlbumModal";
 import PhotographerAuth from "./components/PhotographerAuth";
 import { collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
-import { db, handleFirestoreError, OperationType } from "./firebase";
+import { db, handleFirestoreError, OperationType, removeUndefined } from "./firebase";
 
 export default function App() {
   // State for albums - load dynamically from Firestore
@@ -38,7 +38,7 @@ export default function App() {
           console.log("Banco de dados do Firebase vazio. Inicializando com álbuns padrão...");
           for (const album of DEFAULT_ALBUMS) {
             try {
-              await setDoc(doc(db, "albums", album.id), album);
+              await setDoc(doc(db, "albums", album.id), removeUndefined(album));
             } catch (err) {
               handleFirestoreError(err, OperationType.WRITE, `albums/${album.id}`);
             }
@@ -98,7 +98,7 @@ export default function App() {
     };
 
     try {
-      await setDoc(doc(db, "albums", id), newAlbum);
+      await setDoc(doc(db, "albums", id), removeUndefined(newAlbum));
       // Auto unlock newly created albums for the photographer session
       setUnlockedAlbums((prev) => ({ ...prev, [id]: true }));
       
@@ -143,7 +143,7 @@ export default function App() {
   // Handle updating an album (e.g., photo approval or comment)
   const handleUpdateAlbum = async (updatedAlbum: Album) => {
     try {
-      await setDoc(doc(db, "albums", updatedAlbum.id), updatedAlbum);
+      await setDoc(doc(db, "albums", updatedAlbum.id), removeUndefined(updatedAlbum));
     } catch (err) {
       handleFirestoreError(err, OperationType.UPDATE, `albums/${updatedAlbum.id}`);
     }
