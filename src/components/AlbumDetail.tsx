@@ -450,11 +450,11 @@ export default function AlbumDetail({
       {/* Watermark Configurator Panel */}
       <div
         id="watermark-config-panel"
-        className="rounded-2xl border border-zinc-900 bg-[#0d0d0d] p-4 space-y-3"
+        className="rounded-2xl border border-zinc-200 bg-white p-4 space-y-3 shadow-sm"
       >
         <div className="flex items-center justify-between">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-300 flex items-center gap-1.5">
-            <Sliders className="h-4 w-4 text-[#DFBA6B]" />
+          <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-800 flex items-center gap-1.5">
+            <Sliders className="h-4 w-4 text-[#B8933D]" />
             Configurações de Proteção (Marca d'Água Dinâmica)
           </h4>
           <label className="relative inline-flex items-center cursor-pointer font-bold">
@@ -464,8 +464,8 @@ export default function AlbumDetail({
               onChange={(e) => setWatermarkActive(e.target.checked)}
               className="sr-only peer"
             />
-            <div className="w-9 h-5 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-black after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#DFBA6B]"></div>
-            <span className="ml-2 text-xs font-bold text-zinc-400">Ativa</span>
+            <div className="w-9 h-5 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-zinc-300 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#DFBA6B]"></div>
+            <span className="ml-2 text-xs font-bold text-zinc-600">Ativa</span>
           </label>
         </div>
 
@@ -475,7 +475,7 @@ export default function AlbumDetail({
               <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1">
                 Tipo de Marca d'Água
               </label>
-              <div className="flex gap-1 rounded-lg bg-zinc-950 border border-zinc-900 p-0.5">
+              <div className="flex gap-1 rounded-lg bg-zinc-100 border border-zinc-200 p-0.5">
                 {[
                   { value: "image", label: "Logo PNG" },
                   { value: "text", label: "Texto" },
@@ -487,8 +487,8 @@ export default function AlbumDetail({
                     onClick={() => setWatermarkType(t.value as any)}
                     className={`flex-1 rounded py-1 text-[9px] font-bold uppercase transition-colors ${
                       watermarkType === t.value
-                        ? "bg-[#DFBA6B]/15 text-[#DFBA6B] border border-[#DFBA6B]/25 font-bold"
-                        : "text-zinc-500 hover:text-zinc-300"
+                        ? "bg-[#DFBA6B]/20 text-[#B8933D] border border-[#DFBA6B]/30 font-bold"
+                        : "text-zinc-500 hover:text-zinc-700"
                     }`}
                   >
                     {t.label}
@@ -506,7 +506,7 @@ export default function AlbumDetail({
                 value={watermarkText}
                 disabled={watermarkType === "image"}
                 onChange={(e) => setWatermarkText(e.target.value)}
-                className="w-full rounded-lg border border-zinc-850 bg-zinc-950 px-3 py-1.5 text-xs text-zinc-100 focus:border-[#DFBA6B] focus:outline-none disabled:opacity-40"
+                className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-900 focus:border-[#DFBA6B] focus:outline-none disabled:opacity-40 shadow-sm"
               />
             </div>
             <div>
@@ -545,7 +545,7 @@ export default function AlbumDetail({
         )}
 
         {/* Save button for watermark config */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 border-t border-zinc-900/60 mt-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 border-t border-zinc-100 mt-3">
           <p className="text-[10px] text-zinc-500">
             * Estas configurações definem o visual da marca d'água de proteção na visualização de prova do cliente.
           </p>
