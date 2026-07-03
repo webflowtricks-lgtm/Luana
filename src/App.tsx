@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { CameraOff, ArrowLeft } from "lucide-react";
 import { Album } from "./types";
 import { DEFAULT_ALBUMS } from "./data";
 import Dashboard from "./components/Dashboard";
@@ -63,11 +64,12 @@ export default function App() {
 
   // Handle URL deep links on load (e.g. ?album=album-123) and increment view count
   const [hasIncrementedView, setHasIncrementedView] = useState(false);
+  const [albumNotFound, setAlbumNotFound] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const albumParam = params.get("album");
-    if (albumParam && albums.length > 0 && !hasIncrementedView) {
+    if (albumParam && !isLoading && !hasIncrementedView) {
       const found = albums.find((a) => a.id === albumParam);
       if (found) {
         setActiveAlbumId(albumParam);
@@ -79,9 +81,11 @@ export default function App() {
         updateDoc(albumRef, { views: found.views + 1 }).catch((err) => {
           handleFirestoreError(err, OperationType.UPDATE, `albums/${albumParam}`);
         });
+      } else {
+        setAlbumNotFound(true);
       }
     }
-  }, [albums, hasIncrementedView]);
+  }, [albums, isLoading, hasIncrementedView]);
 
   // Handle creating a new album
   const handleCreateAlbum = async (albumData: Omit<Album, "id" | "createdAt" | "views">) => {
@@ -126,6 +130,7 @@ export default function App() {
   // Handle returning home & clearing query parameter
   const handleGoHome = () => {
     setActiveAlbumId(null);
+    setAlbumNotFound(false);
     window.history.replaceState(null, "", window.location.pathname);
   };
 
@@ -160,7 +165,26 @@ export default function App() {
     <div id="app-wrapper" className="min-h-screen bg-[#050505] text-zinc-100 flex flex-col">
       {/* Main Container */}
       <main id="main-content" className="flex-1 mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {currentRole === "photographer" && !isPhotographerAuthenticated ? (
+        {albumNotFound ? (
+          <div className="flex flex-col items-center justify-center text-center py-16 px-4">
+            <div className="rounded-full bg-zinc-900/80 p-6 border border-zinc-800 mb-6 shadow-lg">
+              <CameraOff className="h-12 w-12 text-[#DFBA6B]" />
+            </div>
+            <h2 className="text-2xl font-bold text-zinc-100 tracking-tight mb-2">
+              Álbum não encontrado
+            </h2>
+            <p className="text-sm text-zinc-400 max-w-md mb-8">
+              O álbum que você está tentando acessar não existe ou foi removido pelo fotógrafo. Por favor, verifique o link enviado.
+            </p>
+            <button
+              onClick={handleGoHome}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#DFBA6B] to-[#B8933D] px-6 py-3 text-sm font-bold text-zinc-950 transition-all hover:opacity-90 active:scale-95 shadow-md shadow-[#DFBA6B]/10"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Voltar ao Início
+            </button>
+          </div>
+        ) : currentRole === "photographer" && !isPhotographerAuthenticated ? (
           <PhotographerAuth onAuthenticate={handleAuthenticatePhotographer} />
         ) : activeAlbumId && activeAlbum ? (
           currentRole === "client" ? (

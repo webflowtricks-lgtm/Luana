@@ -14,6 +14,7 @@ export default function NewAlbumModal({ isOpen, onClose, onSave }: NewAlbumModal
   const [clientName, setClientName] = useState("");
   const [description, setDescription] = useState("");
   const [password, setPassword] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   
   // Choose how to populate photos: stock category or custom uploads
   const [photoSource, setPhotoSource] = useState<"stock" | "upload">("stock");
@@ -73,12 +74,14 @@ export default function NewAlbumModal({ isOpen, onClose, onSave }: NewAlbumModal
     setUploadedPhotos((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !clientName) {
       alert("Por favor, preencha o Nome do Álbum e o Nome do Cliente.");
       return;
     }
+
+    setIsSaving(true);
 
     let photosToSave: Photo[] = [];
     let coverUrl = "";
@@ -102,22 +105,29 @@ export default function NewAlbumModal({ isOpen, onClose, onSave }: NewAlbumModal
       coverUrl = uploadedPhotos[0]?.url || "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=600&q=80";
     }
 
-    onSave({
-      name,
-      clientName,
-      description,
-      password: password.trim() || undefined, // password defined during album creation
-      photos: photosToSave,
-      coverUrl,
-    });
+    try {
+      await onSave({
+        name,
+        clientName,
+        description,
+        password: password.trim() || undefined, // password defined during album creation
+        photos: photosToSave,
+        coverUrl,
+      });
 
-    // Reset form
-    setName("");
-    setClientName("");
-    setDescription("");
-    setPassword("");
-    setUploadedPhotos([]);
-    onClose();
+      // Reset form on success
+      setName("");
+      setClientName("");
+      setDescription("");
+      setPassword("");
+      setUploadedPhotos([]);
+      onClose();
+    } catch (err) {
+      console.error("Erro ao salvar álbum:", err);
+      alert("Erro ao salvar álbum online: " + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -371,17 +381,26 @@ export default function NewAlbumModal({ isOpen, onClose, onSave }: NewAlbumModal
             <button
               id="btn-cancel-new-album"
               type="button"
+              disabled={isSaving}
               onClick={onClose}
-              className="rounded-full px-5 py-2.5 text-sm font-semibold text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200"
+              className="rounded-full px-5 py-2.5 text-sm font-semibold text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200 disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               id="btn-submit-new-album"
               type="submit"
-              className="rounded-full bg-gold-gradient px-7 py-2.5 text-sm font-bold text-black shadow-lg shadow-[#DFBA6B]/10 hover:opacity-95 transition-opacity"
+              disabled={isSaving}
+              className="rounded-full bg-gold-gradient px-7 py-2.5 text-sm font-bold text-black shadow-lg shadow-[#DFBA6B]/10 hover:opacity-95 transition-opacity disabled:opacity-50 flex items-center gap-2"
             >
-              Criar e Salvar Álbum
+              {isSaving ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent"></div>
+                  Salvando...
+                </>
+              ) : (
+                "Criar e Salvar Álbum"
+              )}
             </button>
           </div>
         </form>
