@@ -53,101 +53,14 @@ export default function ClientAlbumView({
   // Selected photo for Zoom/Lightbox
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
-  // Anti-screenshot & image protection states
-  const [isBlurred, setIsBlurred] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // Trigger a temporary protective toast warning
-  const triggerToast = (msg: string) => {
-    setToastMessage(msg);
-    // Auto-clear after 3.5 seconds
-    const timer = setTimeout(() => {
-      setToastMessage(null);
-    }, 3500);
-    return () => clearTimeout(timer);
-  };
-
-  // Prevent right-click, dragging, and keyboard screenshot/save shortcuts
+  // Prevent right-click context menu on the client album page to protect photographer's rights
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => {
       e.preventDefault();
     };
-
-    const handleBlur = () => {
-      // When window loses focus (e.g., taking screenshots or opening clipping tool), overlay gets activated immediately
-      setIsBlurred(true);
-    };
-
-    const handleFocus = () => {
-      // Small delay on returning focus to prevent immediate flashing back if clipping tool lingers
-      setTimeout(() => {
-        setIsBlurred(false);
-      }, 300);
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        setIsBlurred(true);
-      } else {
-        setTimeout(() => {
-          setIsBlurred(false);
-        }, 300);
-      }
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Intercept PrintScreen
-      if (e.key === "PrintScreen" || e.keyCode === 44) {
-        e.preventDefault();
-        setIsBlurred(true);
-        triggerToast("Capturas de tela são proibidas para proteger os direitos autorais da fotógrafa.");
-        try {
-          navigator.clipboard.writeText("Esta galeria é protegida por direitos autorais — Luana Santos Fotografia");
-        } catch (err) {}
-        setTimeout(() => {
-          setIsBlurred(false);
-        }, 2000);
-      }
-
-      // Intercept Ctrl+S / Cmd+S (Save Page)
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
-        e.preventDefault();
-        triggerToast("O download direto de fotos foi desativado para segurança do álbum.");
-      }
-
-      // Intercept Ctrl+P / Cmd+P (Print Page)
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "p") {
-        e.preventDefault();
-        triggerToast("A impressão direta destas fotos foi desativada.");
-      }
-
-      // Intercept Ctrl+C / Cmd+C (Copy Image/Text)
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "c") {
-        e.preventDefault();
-        triggerToast("A cópia de imagens e conteúdos foi desativada neste álbum.");
-      }
-    };
-
-    const handleDragStart = (e: DragEvent) => {
-      if ((e.target as HTMLElement).tagName === "IMG") {
-        e.preventDefault();
-      }
-    };
-
     document.addEventListener("contextmenu", handleContextMenu);
-    window.addEventListener("blur", handleBlur);
-    window.addEventListener("focus", handleFocus);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("dragstart", handleDragStart);
-
     return () => {
       document.removeEventListener("contextmenu", handleContextMenu);
-      window.removeEventListener("blur", handleBlur);
-      window.removeEventListener("focus", handleFocus);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("dragstart", handleDragStart);
     };
   }, []);
 
@@ -472,12 +385,12 @@ export default function ClientAlbumView({
                 <div
                   id={`client-photo-img-wrapper-${photo.id}`}
                   onClick={() => setSelectedPhotoIndex(originalIndex)}
-                  className="relative aspect-[3/2] overflow-hidden bg-zinc-950 cursor-zoom-in select-none"
+                  className="relative aspect-[3/2] overflow-hidden bg-zinc-950 cursor-zoom-in"
                 >
                   <img
                     src={photo.url}
                     alt={photo.name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] select-none pointer-events-none"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                   />
 
                   {/* Watermark Protection Overlay */}
@@ -565,11 +478,11 @@ export default function ClientAlbumView({
               <ChevronLeft className="h-6 w-6" />
             </button>
 
-            <div className="relative max-w-full max-h-[75vh] rounded-xl overflow-hidden shadow-2xl bg-zinc-900 border border-zinc-800 select-none">
+            <div className="relative max-w-full max-h-[75vh] rounded-xl overflow-hidden shadow-2xl bg-zinc-900 border border-zinc-800">
               <img
                 src={album.photos[selectedPhotoIndex].url}
                 alt="lightbox"
-                className="object-contain max-h-[75vh] mx-auto select-none pointer-events-none"
+                className="object-contain max-h-[75vh] mx-auto select-none"
               />
               <WatermarkOverlay />
             </div>
@@ -604,41 +517,6 @@ export default function ClientAlbumView({
               Marque esta foto como favorita clicando no botão acima.
             </p>
           </div>
-        </div>
-      )}
-
-      {/* Embedded print protection styles */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media print {
-          body, html, #root, #client-photos-grid, #client-lightbox-backdrop {
-            display: none !important;
-            visibility: hidden !important;
-          }
-        }
-      `}} />
-
-      {/* Floating anti-screenshot and warning toast */}
-      {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] bg-zinc-950/95 border border-[#DFBA6B]/30 px-5 py-3 rounded-xl shadow-2xl shadow-black/80 flex items-center gap-3 max-w-md animate-slide-up">
-          <div className="h-2 w-2 rounded-full bg-[#DFBA6B] animate-pulse shrink-0" />
-          <p className="text-xs font-bold text-zinc-100 leading-normal">
-            {toastMessage}
-          </p>
-        </div>
-      )}
-
-      {/* Full screen solid pitch black protection overlay when window loses focus (preventing screenshot tools) */}
-      {isUnlocked && isBlurred && (
-        <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black p-6 text-center select-none pointer-events-none">
-          <div className="rounded-full bg-zinc-900/40 p-4 border border-zinc-800/50 mb-3">
-            <Lock className="h-6 w-6 text-zinc-600 animate-pulse" />
-          </div>
-          <h3 className="text-sm font-semibold text-zinc-500 tracking-wider uppercase mb-1">
-            Luana Santos Fotografia
-          </h3>
-          <p className="text-xs text-zinc-700">
-            Modo de Proteção Ativo — Conteúdo de Visualização Privado
-          </p>
         </div>
       )}
     </div>
