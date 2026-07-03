@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Album } from "./types";
 import { DEFAULT_ALBUMS } from "./data";
-import Header from "./components/Header";
 import Dashboard from "./components/Dashboard";
 import AlbumDetail from "./components/AlbumDetail";
 import ClientAlbumView from "./components/ClientAlbumView";
@@ -129,17 +128,6 @@ export default function App() {
 
   return (
     <div id="app-wrapper" className="min-h-screen bg-[#050505] text-zinc-100 flex flex-col">
-      {/* Sticky Header - Hide on direct client album view to feel like a completely distinct page */}
-      {(!activeAlbumId || currentRole === "photographer") && (
-        <Header
-          onNewAlbumClick={() => setIsNewAlbumModalOpen(true)}
-          currentRole={currentRole}
-          onChangeRole={(role) => setCurrentRole(role)}
-          onGoHome={handleGoHome}
-          isPhotographerAuthenticated={isPhotographerAuthenticated}
-        />
-      )}
-
       {/* Main Container */}
       <main id="main-content" className="flex-1 mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {currentRole === "photographer" && !isPhotographerAuthenticated ? (

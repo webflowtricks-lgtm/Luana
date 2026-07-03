@@ -160,7 +160,7 @@ export default function NewAlbumModal({ isOpen, onClose, onSave }: NewAlbumModal
                 id="input-album-name"
                 type="text"
                 required
-                placeholder="Ex: Casamento Mariana & Roberto"
+                placeholder="Ex: Casamento Mariana & Lucas"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full rounded-xl border border-zinc-850 bg-zinc-950 px-4 py-2.5 text-sm text-zinc-100 focus:border-[#DFBA6B] focus:bg-zinc-950 focus:outline-none focus:ring-1 focus:ring-[#DFBA6B]/20"
@@ -174,7 +174,7 @@ export default function NewAlbumModal({ isOpen, onClose, onSave }: NewAlbumModal
                 id="input-client-name"
                 type="text"
                 required
-                placeholder="Ex: Mariana & Roberto"
+                placeholder="Ex: Mariana & Lucas"
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
                 className="w-full rounded-xl border border-zinc-850 bg-zinc-950 px-4 py-2.5 text-sm text-zinc-100 focus:border-[#DFBA6B] focus:bg-zinc-950 focus:outline-none focus:ring-1 focus:ring-[#DFBA6B]/20"

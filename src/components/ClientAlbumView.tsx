@@ -157,7 +157,7 @@ export default function ClientAlbumView({
     const text = album.watermarkText || `Luana Santos © ${album.clientName}`;
     const opacity = album.watermarkOpacity !== undefined ? album.watermarkOpacity : 0.25;
     const size = album.watermarkSize || "md";
-    const imageUrl = album.watermarkImageUrl || "https://i.ibb.co/Zp0kb74z/2.png";
+    const imageUrl = album.watermarkImageUrl || "https://i.ibb.co/CpPqYf91/AAA.png";
 
     return (
       <div
@@ -231,21 +231,23 @@ export default function ClientAlbumView({
           id="client-password-card"
           className="w-full max-w-md rounded-3xl border border-zinc-900 bg-[#0d0d0d] p-8 shadow-2xl text-center space-y-6"
         >
-          {/* Lock icon with gradient */}
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gold-gradient text-black shadow-lg shadow-[#DFBA6B]/20 animate-bounce">
-            <Lock className="h-7 w-7 stroke-[2.5]" />
+          {/* Brand Logo */}
+          <div className="mx-auto flex justify-center py-2">
+            <img
+              src="https://i.ibb.co/XBgjNvB/AAA.png"
+              alt="Luana Santos Fotografia Logo"
+              referrerPolicy="no-referrer"
+              className="h-28 sm:h-36 w-auto object-contain"
+            />
           </div>
 
           <div className="space-y-2">
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#DFBA6B]">
-              Galeria Exclusiva Protegida
-            </span>
             <h3 className="text-2xl font-bold font-serif text-zinc-50 tracking-tight">
               {album.name}
             </h3>
             <p className="text-xs text-zinc-400">
               Olá, <strong className="font-semibold text-[#DFBA6B]">{album.clientName}</strong>! 
-              O fotógrafo protegeu o seu ensaio. Insira a senha definida para liberar o acesso às suas fotos.
+              Insira a senha definida para liberar o acesso às suas fotos.
             </p>
           </div>
 
@@ -278,14 +280,6 @@ export default function ClientAlbumView({
               Liberar Galeria Completa
             </button>
           </form>
-
-          <button
-            id="btn-client-lock-back"
-            onClick={onBack}
-            className="text-xs font-semibold text-zinc-400 hover:text-zinc-100 flex items-center gap-1.5 mx-auto pt-2 transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Voltar ao Painel
-          </button>
         </div>
       </div>
     );
@@ -296,31 +290,28 @@ export default function ClientAlbumView({
       {/* 1. Gorgeous Dedicated Client-Side Header Banner */}
       <div
         id="client-banner"
-        className="relative overflow-hidden rounded-3xl border border-zinc-900 bg-[#0d0d0d] p-6 md:p-8"
+        className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-white p-6 md:p-8 shadow-sm"
       >
-        {/* Subtle background golden glow */}
-        <div className="absolute -top-12 -right-12 h-36 w-36 rounded-full bg-[#DFBA6B]/5 blur-3xl pointer-events-none" />
-
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#DFBA6B]/10 border border-[#DFBA6B]/20 px-3 py-1 text-xs font-bold text-[#DFBA6B]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#B8933D]/10 border border-[#B8933D]/20 px-3 py-1 text-xs font-bold text-[#B8933D]">
                 <Camera className="h-3.5 w-3.5" /> Galeria Privada do Cliente
               </span>
 
               {galleryTimeLeft && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-950/80 px-3 py-1 text-xs font-bold text-[#DFBA6B] border border-zinc-900">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#DFBA6B] animate-pulse"></span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1 text-xs font-bold text-zinc-600 border border-zinc-200">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#B8933D] animate-pulse"></span>
                   Expira em: {galleryTimeLeft}
                 </span>
               )}
             </div>
 
-            <h2 className="text-3xl font-bold tracking-tight text-zinc-100 font-serif">
+            <h2 className="text-3xl font-bold tracking-tight text-zinc-900 font-serif">
               {album.name}
             </h2>
-            <p className="text-sm text-zinc-400 font-medium">
-              Olá, <strong className="text-[#DFBA6B]">{album.clientName}</strong>! Use os corações para favoritar as fotos que você mais gostou.
+            <p className="text-sm text-zinc-600 font-medium">
+              Olá, <strong className="text-[#B8933D] font-bold">{album.clientName}</strong>! Use os corações para favoritar as fotos que você mais gostou.
             </p>
           </div>
 
@@ -328,19 +319,11 @@ export default function ClientAlbumView({
             <button
               id="btn-manual-relock-client"
               onClick={handleManualLock}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-zinc-850 bg-zinc-950 px-4 text-xs font-bold text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900 transition-colors"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-gold-gradient px-5 text-xs font-bold text-black hover:opacity-90 transition-all shadow-md shadow-[#DFBA6B]/10"
               title="Bloquear galeria imediatamente"
             >
-              <LogOut className="h-4 w-4" />
-              Sair / Bloquear
-            </button>
-            <button
-              id="btn-client-banner-back"
-              onClick={onBack}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-gold-gradient px-5 text-xs font-bold text-black hover:opacity-90 transition-all shadow-md shadow-[#DFBA6B]/10"
-            >
-              <ArrowLeft className="h-4 w-4 stroke-[2.5]" />
-              Sair da Galeria
+              <LogOut className="h-4 w-4 stroke-[2.5]" />
+              Sair e Bloquear
             </button>
           </div>
         </div>
@@ -374,9 +357,7 @@ export default function ClientAlbumView({
             </button>
           </div>
 
-          <div className="pb-4 text-xs font-semibold text-zinc-500">
-            {favoritesCount} selecionadas para edição final
-          </div>
+
         </div>
       </div>
 

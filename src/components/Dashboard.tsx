@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Album, Stats } from "../types";
 import { Users, FolderOpen, Image as ImageIcon, Eye, HardDrive, Lock, Plus, Trash2, ArrowRight, Share2, Unlock, AlertTriangle, X, Copy, Check } from "lucide-react";
+import Logo from "./Logo";
 
 interface DashboardProps {
   albums: Album[];
@@ -48,6 +49,11 @@ export default function Dashboard({
 
   return (
     <div id="dashboard-root" className="space-y-8 animate-fade-in">
+      {/* Brand Logo Header */}
+      <div className="flex justify-center py-4">
+        <Logo className="h-28 sm:h-36" />
+      </div>
+
       {/* Visual Header / Banner */}
       <div
         id="dashboard-banner"

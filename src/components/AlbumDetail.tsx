@@ -62,7 +62,7 @@ export default function AlbumDetail({
   // Watermark parameters
   const [watermarkActive, setWatermarkActive] = useState(() => album.watermarkActive !== undefined ? album.watermarkActive : true);
   const [watermarkType, setWatermarkType] = useState<"image" | "text" | "both">(album.watermarkType || "image");
-  const [watermarkImageUrl, setWatermarkImageUrl] = useState(album.watermarkImageUrl || "https://i.ibb.co/Zp0kb74z/2.png");
+  const [watermarkImageUrl, setWatermarkImageUrl] = useState(album.watermarkImageUrl || "https://i.ibb.co/CpPqYf91/AAA.png");
   const [watermarkText, setWatermarkText] = useState(album.watermarkText || `Luana Santos © ${album.clientName}`);
   const [watermarkOpacity, setWatermarkOpacity] = useState(album.watermarkOpacity !== undefined ? album.watermarkOpacity : 0.25); // 0.25 means 25% opacity
   const [watermarkSize, setWatermarkSize] = useState(album.watermarkSize || "md"); // sm, md, lg
@@ -74,7 +74,7 @@ export default function AlbumDetail({
   useEffect(() => {
     setWatermarkActive(album.watermarkActive !== undefined ? album.watermarkActive : true);
     setWatermarkType(album.watermarkType || "image");
-    setWatermarkImageUrl(album.watermarkImageUrl || "https://i.ibb.co/Zp0kb74z/2.png");
+    setWatermarkImageUrl(album.watermarkImageUrl || "https://i.ibb.co/CpPqYf91/AAA.png");
     setWatermarkText(album.watermarkText || `Luana Santos © ${album.clientName}`);
     setWatermarkOpacity(album.watermarkOpacity !== undefined ? album.watermarkOpacity : 0.25);
     setWatermarkSize(album.watermarkSize || "md");
@@ -227,20 +227,22 @@ export default function AlbumDetail({
           id="password-form-card"
           className="w-full max-w-md rounded-3xl border border-zinc-900 bg-[#0d0d0d] p-8 shadow-2xl text-center space-y-6"
         >
-          {/* Animated Lock */}
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gold-gradient text-black shadow-lg shadow-[#DFBA6B]/20 animate-bounce">
-            <Lock className="h-7 w-7 stroke-[2.5]" />
+          {/* Brand Logo */}
+          <div className="mx-auto flex justify-center py-2">
+            <img
+              src="https://i.ibb.co/XBgjNvB/AAA.png"
+              alt="Luana Santos Fotografia Logo"
+              referrerPolicy="no-referrer"
+              className="h-28 sm:h-36 w-auto object-contain"
+            />
           </div>
 
           <div className="space-y-2">
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#DFBA6B]">
-              Galeria Privada Protegida
-            </span>
             <h3 className="text-2xl font-bold font-serif text-zinc-50 tracking-tight">
               {album.name}
             </h3>
             <p className="text-xs text-zinc-400">
-              Olá, <span className="font-bold text-[#DFBA6B]">{album.clientName}</span>! Esta galeria de fotos é de acesso restrito. Insira a senha fornecida pelo fotógrafo para visualizá-la.
+              Olá, <span className="font-bold text-[#DFBA6B]">{album.clientName}</span>! Insira a senha fornecida pelo fotógrafo para visualizá-la.
             </p>
           </div>
 
@@ -287,13 +289,7 @@ export default function AlbumDetail({
             </p>
           </div>
 
-          <button
-            id="btn-lock-back"
-            onClick={onBack}
-            className="text-xs font-bold text-zinc-400 hover:text-zinc-100 flex items-center gap-1.5 mx-auto pt-2 transition-colors"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Voltar ao Painel
-          </button>
+
         </div>
       </div>
     );
