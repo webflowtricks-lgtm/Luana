@@ -6,20 +6,13 @@ import AlbumDetail from "./components/AlbumDetail";
 import ClientAlbumView from "./components/ClientAlbumView";
 import NewAlbumModal from "./components/NewAlbumModal";
 import PhotographerAuth from "./components/PhotographerAuth";
+import { collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { db, handleFirestoreError, OperationType } from "./firebase";
 
 export default function App() {
-  // State for albums - load from localStorage or fall back to default mockup
-  const [albums, setAlbums] = useState<Album[]>(() => {
-    const saved = localStorage.getItem("lumiere_albums");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error("Erro ao carregar álbuns do localStorage:", e);
-      }
-    }
-    return DEFAULT_ALBUMS;
-  });
+  // State for albums - load dynamically from Firestore
+  const [albums, setAlbums] = useState<Album[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Photographer authentication state
   const [isPhotographerAuthenticated, setIsPhotographerAuthenticated] = useState<boolean>(() => {
@@ -34,64 +27,99 @@ export default function App() {
   // Keep track of which album IDs have been unlocked in the current session
   const [unlockedAlbums, setUnlockedAlbums] = useState<Record<string, boolean>>({});
 
-  // Sync albums to local storage on changes
+  // Real-time synchronization with Firestore
   useEffect(() => {
-    localStorage.setItem("lumiere_albums", JSON.stringify(albums));
-  }, [albums]);
+    const unsubscribe = onSnapshot(
+      collection(db, "albums"),
+      async (snapshot) => {
+        if (snapshot.empty) {
+          // If Firestore database is empty, seed it with DEFAULT_ALBUMS so there is initial data
+          console.log("Banco de dados do Firebase vazio. Inicializando com álbuns padrão...");
+          for (const album of DEFAULT_ALBUMS) {
+            try {
+              await setDoc(doc(db, "albums", album.id), album);
+            } catch (err) {
+              handleFirestoreError(err, OperationType.WRITE, `albums/${album.id}`);
+            }
+          }
+        } else {
+          const loadedAlbums: Album[] = [];
+          snapshot.forEach((d) => {
+            loadedAlbums.push(d.data() as Album);
+          });
+          // Sort by createdAt descending
+          loadedAlbums.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          setAlbums(loadedAlbums);
+          setIsLoading(false);
+        }
+      },
+      (error) => {
+        handleFirestoreError(error, OperationType.GET, "albums");
+      }
+    );
 
-  // Handle URL deep links on load (e.g. ?album=album-123)
+    return () => unsubscribe();
+  }, []);
+
+  // Handle URL deep links on load (e.g. ?album=album-123) and increment view count
+  const [hasIncrementedView, setHasIncrementedView] = useState(false);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const albumParam = params.get("album");
-    if (albumParam) {
-      // Check if this album exists
+    if (albumParam && albums.length > 0 && !hasIncrementedView) {
       const found = albums.find((a) => a.id === albumParam);
       if (found) {
         setActiveAlbumId(albumParam);
         setCurrentRole("client"); // Direct client-facing protected workspace experience!
-        
-        // Increment view count dynamically since client visited deep link
-        setAlbums((prev) =>
-          prev.map((album) => {
-            if (album.id === albumParam) {
-              return { ...album, views: album.views + 1 };
-            }
-            return album;
-          })
-        );
+        setHasIncrementedView(true);
+
+        // Increment view count dynamically in Firestore
+        const albumRef = doc(db, "albums", albumParam);
+        updateDoc(albumRef, { views: found.views + 1 }).catch((err) => {
+          handleFirestoreError(err, OperationType.UPDATE, `albums/${albumParam}`);
+        });
       }
     }
-  }, []); // Run once on mount
+  }, [albums, hasIncrementedView]);
 
   // Handle creating a new album
-  const handleCreateAlbum = (albumData: Omit<Album, "id" | "createdAt" | "views">) => {
+  const handleCreateAlbum = async (albumData: Omit<Album, "id" | "createdAt" | "views">) => {
+    const id = "album-" + Math.random().toString(36).substring(2, 9);
     const newAlbum: Album = {
       ...albumData,
-      id: "album-" + Math.random().toString(36).substring(2, 9),
+      id,
       createdAt: new Date().toISOString(),
       views: 0,
     };
 
-    setAlbums((prev) => [newAlbum, ...prev]);
-    
-    // Auto unlock newly created albums for the photographer session
-    setUnlockedAlbums((prev) => ({ ...prev, [newAlbum.id]: true }));
-    
-    // Friendly reminder about the password configured
-    if (newAlbum.password) {
-      alert(
-        `Álbum "${newAlbum.name}" criado com sucesso!\n\n🔑 Senha configurada: ${newAlbum.password}\n\nVocê pode testar o bloqueio mudando para o "Modo Cliente" no topo da página!`
-      );
-    } else {
-      alert(`Álbum "${newAlbum.name}" criado com sucesso sem restrições de senha.`);
+    try {
+      await setDoc(doc(db, "albums", id), newAlbum);
+      // Auto unlock newly created albums for the photographer session
+      setUnlockedAlbums((prev) => ({ ...prev, [id]: true }));
+      
+      // Friendly reminder about the password configured
+      if (newAlbum.password) {
+        alert(
+          `Álbum "${newAlbum.name}" criado com sucesso!\n\n🔑 Senha configurada: ${newAlbum.password}\n\nVocê pode testar o bloqueio mudando para o "Modo Cliente" no topo da página!`
+        );
+      } else {
+        alert(`Álbum "${newAlbum.name}" criado com sucesso sem restrições de senha.`);
+      }
+    } catch (err) {
+      handleFirestoreError(err, OperationType.CREATE, `albums/${id}`);
     }
   };
 
   // Handle deleting an album
-  const handleDeleteAlbum = (id: string) => {
-    setAlbums((prev) => prev.filter((album) => album.id !== id));
-    if (activeAlbumId === id) {
-      handleGoHome();
+  const handleDeleteAlbum = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "albums", id));
+      if (activeAlbumId === id) {
+        handleGoHome();
+      }
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `albums/${id}`);
     }
   };
 
@@ -108,10 +136,12 @@ export default function App() {
   };
 
   // Handle updating an album (e.g., photo approval or comment)
-  const handleUpdateAlbum = (updatedAlbum: Album) => {
-    setAlbums((prev) =>
-      prev.map((album) => (album.id === updatedAlbum.id ? updatedAlbum : album))
-    );
+  const handleUpdateAlbum = async (updatedAlbum: Album) => {
+    try {
+      await setDoc(doc(db, "albums", updatedAlbum.id), updatedAlbum);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.UPDATE, `albums/${updatedAlbum.id}`);
+    }
   };
 
   // Handle unlocking an album successfully

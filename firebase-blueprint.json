@@ -1,0 +1,42 @@
+{
+  "entities": {
+    "albums": {
+      "title": "Album",
+      "description": "Photographer album containing client metadata, photos, password protection, and selection/comments.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "clientName": { "type": "string" },
+        "description": { "type": "string" },
+        "password": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "views": { "type": "number" },
+        "coverUrl": { "type": "string" },
+        "watermarkActive": { "type": "boolean" },
+        "watermarkType": { "type": "string" },
+        "watermarkText": { "type": "string" },
+        "watermarkOpacity": { "type": "number" },
+        "watermarkSize": { "type": "string" },
+        "watermarkImageUrl": { "type": "string" },
+        "photos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "url": { "type": "string" },
+              "name": { "type": "string" },
+              "size": { "type": "number" },
+              "uploadedAt": { "type": "string" },
+              "approved": { "type": "boolean" },
+              "comment": { "type": "string" }
+            },
+            "required": ["id", "url", "name", "size", "uploadedAt"]
+          }
+        }
+      },
+      "required": ["id", "name", "clientName", "description", "createdAt", "views", "photos"]
+    }
+  }
+}
